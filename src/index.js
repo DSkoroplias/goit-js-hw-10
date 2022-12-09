@@ -16,9 +16,8 @@ refs.inputEl.addEventListener('input', debounce(inputSearch, DEBOUNCE_DELAY));
 
 function inputSearch(event) {
   const inputValue = event.target.value.trim();
-
+  clearList();
   if (!inputValue) {
-    clearInput();
     return;
   }
   fetchCountries(inputValue)
@@ -27,7 +26,7 @@ function inputSearch(event) {
 
       const resLength = res.length;
       if (resLength === 1) {
-        createCountryCard(res);
+        createCountryMarkup(res);
         return;
       }
 
@@ -44,48 +43,48 @@ function inputSearch(event) {
     });
 }
 
-function createCountryCard(resLength) {
-  const countryCardMarkup = resLength
-    .map(({ name, capital, population, flags, languages }) => {
-      let lang = '';
-      for (let key in languages) {
-        lang = languages[key];
-      }
-      return `<div class="country-info-card">
-        <img class="country-flag" src="${flags.svg}" width="33" height="30" alt="flag">
-        <h1 class="country-name">${name.official}</h1>
+function createCountryMarkup(countries) {
+  const markup = countries
+    .map(
+      country =>
+        `<div class="country-info-card">
+        <img class="country-flag" src="${
+          country.flags.svg
+        }" width="33" height="30" alt="flag">
+        <h1 class="country-name">${country.name.official}</h1>
             </div>
         <div> <ul class="country-list">
                 <li class="country-item">
-                <h4>Capital:</h4> <span>${capital}</span>
+                <h4>Capital:</h4> <span>${country.capital}</span>
                 </li>
                 <li class="country-item">
-                <h4>Population:</h4> <span>${population}</span>
+                <h4>Population:</h4> <span>${country.population}</span>
                 </li>
                 <li class="country-item">
-                <h4>Languages: </h4><span>${lang}</span>
+                <h4>Languages: </h4><span>${Object.values(
+                  country.languages
+                ).join(', ')}}</span>
                 </li>
                 </ul>
-        </div>`;
-    })
+        </div>`
+    )
     .join('');
 
-  refs.countryInfoEl.insertAdjacentHTML('beforeend', countryCardMarkup);
+  refs.countryInfoEl.insertAdjacentHTML('beforeend', markup);
 }
 
-function createListCountry(resLength) {
-  const countryListMarkup = resLength
-    .map(({ name, flags }) => {
-      return `
-    <li class="country-item"><img class="country-flag" src="${flags.svg}" alt="flag" width='20' height ='15' >${name.official}</li>
-    `;
-    })
+function createListCountry(countries) {
+  const markup = countries
+    .map(
+      country =>
+        `<li class="country-item"><img class="country-flag" src="${country.flags.svg}" alt="flag" width='20' height ='15' >${country.name.official}</li>`
+    )
     .join('');
 
-  refs.listEl.insertAdjacentHTML('beforeend', countryListMarkup);
+  refs.countryInfoEl.insertAdjacentHTML('beforeend', markup);
 }
 
-function clearInput() {
+function clearList() {
   refs.listEl.innerHTML = '';
   refs.countryInfoEl.innerHTML = '';
 }
